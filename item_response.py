@@ -17,18 +17,13 @@ def sigmoid(x):
 def neg_log_likelihood(data, theta, beta):
     """Compute the negative log-likelihood.
 
-    You may optionally replace the function arguments to receive a matrix.
-
     :param data: A dictionary {user_id: list, question_id: list,
     is_correct: list}
     :param theta: Vector
     :param beta: Vector
     :return: float
     """
-    #####################################################################
-    # TODO:                                                             #
-    # Implement the function as described in the docstring.             #
-    #####################################################################
+
     log_lklihood = 0.0
 
     for i in range(len(data["question_id"])):
@@ -42,13 +37,9 @@ def neg_log_likelihood(data, theta, beta):
         p = sigmoid(theta_i - beta_j)
 
         log_lklihood += c_ij * np.log(p) + (1 - c_ij) * np.log(1 - p)
-    #####################################################################
-    #                       END OF YOUR CODE                            #
-    #####################################################################
+
     return -log_lklihood
 
-
-# PART B
 def regular_neg_log_likelihood(data, theta, beta, lambda_theta, lambda_beta, reg_type):
     """Compute the REGULARIZED negative log-likelihood.
 
@@ -96,13 +87,6 @@ def regular_neg_log_likelihood(data, theta, beta, lambda_theta, lambda_beta, reg
 def update_theta_beta(data, lr, theta, beta):
     """Update theta and beta using gradient descent.
 
-    You are using alternating gradient descent. Your update should look:
-    for i in iterations ...
-        theta <- new_theta
-        beta <- new_beta
-
-    You may optionally replace the function arguments to receive a matrix.
-
     :param data: A dictionary {user_id: list, question_id: list,
     is_correct: list}
     :param lr: float
@@ -110,10 +94,7 @@ def update_theta_beta(data, lr, theta, beta):
     :param beta: Vector
     :return: tuple of vectors
     """
-    #####################################################################
-    # TODO:                                                             #
-    # Implement the function as described in the docstring.             #
-    #####################################################################
+
     d_theta = np.zeros_like(theta)
     d_beta = np.zeros_like(beta)
 
@@ -132,13 +113,9 @@ def update_theta_beta(data, lr, theta, beta):
 
     theta += lr * d_theta
     beta += lr * d_beta
-    #####################################################################
-    #                       END OF YOUR CODE                            #
-    #####################################################################
+
     return theta, beta
 
-
-# PART B
 def regular_update_theta_beta(data, lr, theta, beta, lambda_theta, lambda_beta, reg_type):
     """Update theta and beta using gradient descent with REGULARIZATION.
 
@@ -186,8 +163,6 @@ def regular_update_theta_beta(data, lr, theta, beta, lambda_theta, lambda_beta, 
 def irt(data, val_data, lr, iterations):
     """Train IRT model.
 
-    You may optionally replace the function arguments to receive a matrix.
-
     :param data: A dictionary {user_id: list, question_id: list,
     is_correct: list}
     :param val_data: A dictionary {user_id: list, question_id: list,
@@ -216,15 +191,10 @@ def irt(data, val_data, lr, iterations):
         print("NLLK: {} \t Score: {}".format(neg_lld_train, score))
         theta, beta = update_theta_beta(data, lr, theta, beta)
 
-    # TODO: You may change the return values to achieve what you want.
     return theta, beta, val_acc_lst, train_log_likelihoods, val_log_likelihoods
 
-
-# PART B
 def regular_irt(data, val_data, lr, iterations, lambda_theta, lambda_beta, reg_type):
     """Train IRT model.
-
-    You may optionally replace the function arguments to receive a matrix.
 
     :param data: A dictionary {user_id: list, question_id: list,
     is_correct: list}
@@ -284,11 +254,6 @@ def main():
     val_data = load_valid_csv("./data")
     test_data = load_public_test_csv("./data")
 
-    #####################################################################
-    # TODO:                                                             #
-    # Tune learning rate and number of iterations. With the implemented #
-    # code, report the validation and test accuracy.                    #
-    #####################################################################
     # hyperparameters
     learning_rate = 0.005
     iterations = 100
@@ -317,14 +282,6 @@ def main():
     print("Final Validation Accuracy: {}".format(val_acc))
     print("Final Test Accuracy: {}".format(test_acc))
 
-    #####################################################################
-    #                       END OF YOUR CODE                            #
-    #####################################################################
-
-    #####################################################################
-    # TODO:                                                             #
-    # Implement part (d)                                                #
-    #####################################################################
     j1, j2, j3 = 1, 2, 3
 
     # plot sigmoid function
@@ -337,12 +294,7 @@ def main():
     plt.legend()
     plt.title("Probability of Correct Response vs. Student")
     plt.show()
-    #####################################################################
-    #                       END OF YOUR CODE                            #
-    #####################################################################
 
-
-# PART B
 def part_b():
     train_data = load_train_csv("./data")
     val_data = load_valid_csv("./data")
@@ -401,4 +353,3 @@ def part_b():
 
 if __name__ == "__main__":
     main()
-    # part_b()

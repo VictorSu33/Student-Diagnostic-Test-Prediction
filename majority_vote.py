@@ -11,9 +11,6 @@ from utils import (
 def main():
     """Returns the majority vote.
 
-    This code serves as an example how to load the data and
-    submit your result to kaggle.
-
     :return: None
     """
     # Load the train data.
@@ -70,7 +67,7 @@ def main():
         else:
             predictions.append(0.0)
     private_test["is_correct"] = predictions
-    # Save your predictions to make it ready to submit to Kaggle.
+
     save_private_test_csv(private_test)
     return
 

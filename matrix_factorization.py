@@ -18,10 +18,9 @@ def svd_reconstruct(matrix, k):
     :param k: int
     :return: 2D matrix
     """
-    # First, you need to fill in the missing values (NaN) to perform SVD.
+    # Fill in the missing values to perform SVD.
     # Fill in the missing values using the average on the current item.
-    # Note that there are many options to do fill in the
-    # missing values (e.g. fill with 0).
+
     new_matrix = matrix.copy()
     mask = np.isnan(new_matrix)
     masked_matrix = np.ma.masked_array(new_matrix, mask)

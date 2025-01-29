@@ -37,19 +37,13 @@ def knn_impute_by_item(matrix, valid_data, k):
     :param k: int
     :return: float
     """
-    #####################################################################
-    # Implement the function as described in the docstring.             #
  
     nbrs = KNNImputer(n_neighbors=k)
     mat = nbrs.fit_transform(matrix.T).T
 
-    #####################################################################
-    #might need to check if transpose is needed
     acc = sparse_matrix_evaluate(valid_data, mat)
     print("Validation Accuracy Imputing By Item: {}".format(acc))
-    #####################################################################
-    #                       END OF YOUR CODE                            #
-    #####################################################################
+
     return acc
  
  
@@ -97,10 +91,6 @@ def main():
     k_optimal = k_values[np.argmax(val_acc)]
     test_acc = knn_impute_by_item(sparse_matrix, test_data, k_optimal)
     print("Test Accuracy Imputing By Item: {}".format(test_acc))
-    #####################################################################
-    #                       END OF YOUR CODE                            #
-    #####################################################################
- 
  
 if __name__ == "__main__":
     main()

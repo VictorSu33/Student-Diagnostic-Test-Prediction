@@ -50,17 +50,21 @@ class AutoEncoder(nn.Module):
         super(AutoEncoder, self).__init__()
 
         # Define linear functions.
-        self.g = nn.Linear(num_question, k)
-        self.h = nn.Linear(k, num_question)
+        self.w1 = nn.Linear(num_question, k)
+        self.w2 = nn.Linear(k, num_question)
+
+        # Define encoder and decoder
+        self.encoder = nn.Sequential(self.w1, nn.Sigmoid())
+        self.decoder = nn.Sequential(self.w2, nn.Sigmoid())
 
     def get_weight_norm(self):
         """Return ||W^1||^2 + ||W^2||^2.
 
         :return: float
         """
-        g_w_norm = torch.norm(self.g.weight, 2) ** 2
-        h_w_norm = torch.norm(self.h.weight, 2) ** 2
-        return g_w_norm + h_w_norm
+        w1_norm = torch.norm(self.w1.weight, 2) ** 2
+        w2_norm = torch.norm(self.w2.weight, 2) ** 2
+        return w1_norm + w2_norm
 
     def forward(self, inputs):
         """Return a forward pass given inputs.
@@ -68,15 +72,8 @@ class AutoEncoder(nn.Module):
         :param inputs: user vector.
         :return: user vector.
         """
-        #####################################################################
-        # TODO:                                                             #
-        # Implement the function as described in the docstring.             #
-        # Use sigmoid activations for f and g.                              #
-        #####################################################################
-        out = inputs
-        #####################################################################
-        #                       END OF YOUR CODE                            #
-        #####################################################################
+        encoded = self.encoder(inputs)
+        out = self.decoder(encoded)
         return out
 
 
@@ -93,8 +90,6 @@ def train(model, lr, lamb, train_data, zero_train_data, valid_data, num_epoch):
     :param num_epoch: int
     :return: None
     """
-    # TODO: Add a regularizer to the cost function.
-
     # Tell PyTorch you are training the model.
     model.train()
 
@@ -116,7 +111,7 @@ def train(model, lr, lamb, train_data, zero_train_data, valid_data, num_epoch):
             nan_mask = np.isnan(train_data[user_id].unsqueeze(0).numpy())
             target[nan_mask] = output[nan_mask]
 
-            loss = torch.sum((output - target) ** 2.0)
+            loss = torch.sum((output - target) ** 2.0) + 0.5 * lamb * model.get_weight_norm()
             loss.backward()
 
             train_loss += loss.item()
@@ -128,9 +123,7 @@ def train(model, lr, lamb, train_data, zero_train_data, valid_data, num_epoch):
                 epoch, train_loss, valid_acc
             )
         )
-    #####################################################################
-    #                       END OF YOUR CODE                            #
-    #####################################################################
+
 
 
 def evaluate(model, train_data, valid_data):
@@ -160,28 +153,24 @@ def evaluate(model, train_data, valid_data):
 
 
 def main():
+
     zero_train_matrix, train_matrix, valid_data, test_data = load_data()
-
-    #####################################################################
-    # TODO:                                                             #
-    # Try out 5 different k and select the best k using the             #
-    # validation set.                                                   #
-    #####################################################################
+    num_question = train_matrix.shape[1]
     # Set model hyperparameters.
-    k = None
-    model = None
+    k_list = [10, 50, 100, 200, 500]
+    lamb_list = [0.001, 0.01, 0.1, 1]
+    k = k_list[0]
 
-    # Set optimization hyperparameters.
-    lr = None
-    num_epoch = None
-    lamb = None
+    # Set optimization hyperparameters (below are the hyperparameters tuned to optimal values).
+    lr = 0.025
+    num_epoch = 45
+    lamb = lamb_list[0]
 
-    train(model, lr, lamb, train_matrix, zero_train_matrix, valid_data, num_epoch)
-    # Next, evaluate your network on validation/test data
-
-    #####################################################################
-    #                       END OF YOUR CODE                            #
-    #####################################################################
+    model = AutoEncoder(num_question, k)
+    final_valid_acc = train(model, lr, lamb, train_matrix, zero_train_matrix,
+                            valid_data, num_epoch)
+    test_acc = evaluate(model, zero_train_matrix, test_data)
+    print("Final test accuracy: {test}, Final valid accuracy: {valid}".format(test=test_acc, valid=final_valid_acc))
 
 
 if __name__ == "__main__":
